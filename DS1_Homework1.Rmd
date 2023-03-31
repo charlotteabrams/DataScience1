@@ -1,0 +1,87 @@
+---
+title: "DS1_Homework1"
+author: "Charlotte Abrams"
+output: html_document
+date: "2023-03-31"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+Problem 1
+
+```{r}
+data("penguins", package = "palmerpenguins")
+penguins
+unique(penguins$species)
+unique(penguins$island)
+```
+### Data description
+
+The penguins dataset contains records for `r nrow(penguins)` individual penguins from three species (`r unique(penguins$species)`) living on three islands (`r unique(penguins$island)`). The data include `r ncol(penguins)` variables, and are primarily physiological -- measurements of bill, flippers, body mass, and sex -- in addition to species, island, and year.
+
+The mean flipper length (rounded to the nearest mm) of penguins with nonmissing values in this dataset is `r round(mean(pull(penguins, flipper_length_mm), na.rm = TRUE))` mm.
+ 
+Below is a scatterplot comparing flipper length to bill length, color coded by species. 
+
+```{r scatterplot}
+ggplot(penguins, aes(x = bill_length_mm, y = flipper_length_mm, color = species)) + 
+  geom_point()
+
+ggsave("DS1_Homework1_scatterplot.pdf")
+```
+
+
+## Problem 2
+
+### Create data frame
+
+Below we create a tibble consisting of:
+
+* a random sample of size 10 from a standard Normal distribution
+* a logical vector indicating whether elements of the sample are greater than 0
+* a character vector of length 10
+* a factor vector of length 10, with 3 different factor "levels"
+
+```{r create_df}
+prob2_df = 
+  tibble(
+    samp = rnorm(10),
+    samp_gt_0 = samp > 0,
+    char_vec = c("a", "b", "c", "d", "e", "f", "g", "h", "i", "j"),
+    factor_vec = factor(c("low", "low", "low", "medium", "medium", "medium", "medium", "high", "high", "high"))
+  )
+```
+
+### Take the mean of each variable
+
+When we try to take the mean of each variable:
+
+* We can successfully take the mean of `samp` because they are all numeric values. 
+* We can successfully take the mean of `samp_gt_0` because R interprets the logical vector as a vector of 0's (FALSE's) and 1's (TRUE's). The resulting mean is the proportion of TRUE values.
+* We get warnings for the variables `char_vec` and `factor_vec` because neither are numeric nor logical, and can't be interpreted as numeric. The resulting output is `NA`.
+
+```{r mean_pull_var}
+mean(pull(prob2_df, samp))
+mean(pull(prob2_df, samp_gt_0))
+mean(pull(prob2_df, char_vec))
+mean(pull(prob2_df, factor_vec))
+```
+
+### Convert variables to numeric
+
+Next we apply the `as.numeric` function to the logical, character, and factor variables.
+
+* We can successfully convert `samp` because they are all numeric values already. 
+* We can successfully convert `samp_gt_0` to numeric, taking values of 0 (FALSE) and 1 (TRUE).
+* We cannot convert `char_vec` to numeric. The result is a warning and a vector of NA's.
+* We can successfully convert `factor_vec` to numeric, taking values of 2 for `"low"`, 3 for `"medium"`, and 3 for `"high"`. Numeric values are assigned to the factor levels, which are alphabetical unless otherwise specified.
+
+```{r try_numeric}
+as.numeric(pull(prob2_df, samp))
+as.numeric(pull(prob2_df, samp_gt_0))
+as.numeric(pull(prob2_df, char_vec))
+as.numeric(pull(prob2_df, factor_vec))
+```
